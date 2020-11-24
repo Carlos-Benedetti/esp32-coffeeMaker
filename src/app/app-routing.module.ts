@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'folder/Inbox',
+    redirectTo: 'bluetooth-find',
     pathMatch: 'full'
   },
   {
@@ -12,8 +12,12 @@ const routes: Routes = [
     loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
   },
   {
-    path: 'coffeemaker',
+    path: 'coffeemaker/:ip',
     loadChildren: () => import('./coffeemaker/coffeemaker.module').then( m => m.CoffeemakerPageModule)
+  },
+  {
+    path: 'bluetooth-find',
+    loadChildren: () => import('./bluetooth-find/bluetooth-find.module').then( m => m.BluetoothFindPageModule)
   }
 ];
 

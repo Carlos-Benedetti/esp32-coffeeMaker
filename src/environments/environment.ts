@@ -3,7 +3,17 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  firebase: {
+    apiKey: "AIzaSyDijuMZR8te6OqqvpP0DdCB69m1QtcOSDw",
+    authDomain: "esp32-coffeemaker.firebaseapp.com",
+    databaseURL: "https://esp32-coffeemaker.firebaseio.com",
+    projectId: "esp32-coffeemaker",
+    storageBucket: "esp32-coffeemaker.appspot.com",
+    messagingSenderId: "509709883439",
+    appId: "1:509709883439:web:a9a14925d9a759e3df0eda",
+    measurementId: "G-G2R4GHJP0Z"
+  }
 };
 
 /*
