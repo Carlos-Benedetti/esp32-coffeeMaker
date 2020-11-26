@@ -1,6 +1,10 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ActionSheetController, IonDatetime } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
+import { ActionSheetController, IonDatetime, LoadingController } from '@ionic/angular';
+import { tap } from 'rxjs/operators'
 import * as moment from 'moment';
+import { CoffeeMakerController } from '../coffee-maker-controller';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-coffeemaker',
@@ -12,63 +16,80 @@ export class CoffeemakerPage implements OnInit {
   public timerpassed: number
   public done = false
   public coffeeIntent: CoffeeIntent;
-  constructor(public actionSheetController: ActionSheetController) { }
+  private coffeeMakerController: CoffeeMakerController;
+  loading: HTMLIonLoadingElement;
+  constructor(public actionSheetController: ActionSheetController, private activatedRoute: ActivatedRoute, public loadingController: LoadingController) { }
 
-  ngOnInit() {
+  async presentLoading() {
+    this.loading = await this.loadingController.create({
+      spinner: 'circular',
+    });
+    this.loading.present();
   }
-  async forceActionSheet(){
+  async ngOnInit() {
+    await this.presentLoading()
+    this.getQueryParans().subscribe(() => {
+      this.loadPage()
+    })
+  }
+  async loadPage() {
+    this.loading.dismiss();
+
+  }
+
+  getQueryParans() {
+    return this.activatedRoute.data.pipe(
+      tap(({ coffeeMakerController }) => {
+        this.coffeeMakerController = coffeeMakerController as CoffeeMakerController
+      })
+    )
+  }
+  async forceActionSheet() {
     const actionSheet = await this.actionSheetController.create({
       header: 'Forçar Ação',
       buttons: [{
-        text: 'Parar',
-        role: 'destructive',
+        text: 'Desligar',
         icon: 'trash',
+        cssClass: 'btn-cofee off',
         handler: () => {
-          console.log('Delete clicked');
+          this.coffeeMakerController.off().subscribe()
         }
       }, {
-        text: 'Share',
+        text: 'Ligar',
         icon: 'share',
+        cssClass: 'btn-cofee on',
         handler: () => {
-          console.log('Share clicked');
-        }
-      }, {
-        text: 'Play (open modal)',
-        icon: 'caret-forward-circle',
-        handler: () => {
-          console.log('Play clicked');
-        }
-      }, {
-        text: 'Favorite',
-        icon: 'heart',
-        handler: () => {
-          console.log('Favorite clicked');
+          this.coffeeMakerController.on().subscribe()
         }
       }, {
         text: 'Cancel',
         icon: 'close',
         role: 'cancel',
         handler: () => {
-          console.log('Cancel clicked');
+
         }
       }]
     });
     await actionSheet.present();
   }
   startCoffee() {
-    const executionTimerTime = new Date(this.executionTime.value)
-    const endTime = moment()
+    this.coffeeMakerController.on().subscribe(() => {
+      const executionTimerTime = new Date(this.executionTime.value)
+      const endTime = moment()
 
-    endTime.add(executionTimerTime.getMinutes(), 'minutes')
-    endTime.add(executionTimerTime.getSeconds(), 'seconds')
+      endTime.add(executionTimerTime.getMinutes(), 'minutes')
+      endTime.add(executionTimerTime.getSeconds(), 'seconds')
 
-    console.log(moment().diff(endTime))
-    this.coffeeIntent = new CoffeeIntent(moment(), endTime)
+      console.log(moment().diff(endTime))
+      this.coffeeIntent = new CoffeeIntent(moment(), endTime, this.coffeeMakerController);
+    })
   }
   endCoffee() {
-    if (this.coffeeIntent) {
-      this.coffeeIntent.done = true
-    }
+    this.coffeeMakerController.off().subscribe(() => {
+      if (this.coffeeIntent) {
+        this.coffeeIntent.done = true
+      }
+    })
   }
 }
 export class CoffeeIntent {
@@ -77,22 +98,31 @@ export class CoffeeIntent {
     return this._done;
   }
   public set done(value) {
-    this._done = value;
-    if (this._done && this.timer) {
-      console.log("cleaning interval")
-      clearInterval(this.timer)
+    if (value !== this._done && value === false) {
+      this.coffeeMakerController.off().subscribe(() => {
+        this._done = false;
+      })
+    } else {
+      this._done = value;
     }
+
+
+
   }
   public timerpassed = 0
+  public timeRemaning
   timer: any;
-  constructor(public startTime: moment.Moment, public endTime: moment.Moment) {
+  constructor(public startTime: moment.Moment, public endTime: moment.Moment, private coffeeMakerController: CoffeeMakerController) {
     this.timer = setInterval(() => this.calculateTimer(), 1000)
+    this.coffeeMakerController.on()
   }
 
   calculateTimer() {
     this.timerpassed = (moment().unix() - this.startTime.unix()) / (this.endTime.unix() - this.startTime.unix())
+    this.timeRemaning = this.endTime.diff(moment(), 'seconds')
     if (this.timerpassed >= 1) {
       this.done = true
+      clearInterval(this.timer)
     }
   }
 }

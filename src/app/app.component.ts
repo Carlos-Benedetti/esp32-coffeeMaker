@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     const path = window.location.pathname.split('coffeemaker/')[1];
     if (path !== undefined) {
-      this.selectedIndex = this.coffeemakerDBSvc.coffeeMakers.findIndex(page => page.ip.toLowerCase() === path.toLowerCase());
+      this.selectedIndex = Object.keys(this.coffeemakerDBSvc.coffeeMakers).findIndex(cm => cm.toLowerCase() === path.toLowerCase());
     }
   }
 }

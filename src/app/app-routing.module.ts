@@ -12,12 +12,16 @@ const routes: Routes = [
     loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
   },
   {
-    path: 'coffeemaker/:ip',
+    path: 'coffeemaker/:id',
     loadChildren: () => import('./coffeemaker/coffeemaker.module').then( m => m.CoffeemakerPageModule)
   },
   {
     path: 'bluetooth-find',
     loadChildren: () => import('./bluetooth-find/bluetooth-find.module').then( m => m.BluetoothFindPageModule)
+  },
+  {
+    path: '404',
+    loadChildren: () => import('./error/error.module').then( m => m.ErrorPageModule)
   }
 ];
 

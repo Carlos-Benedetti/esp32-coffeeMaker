@@ -1,6 +1,9 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>coffeemaker</ion-title>
+    <ion-title>coffeemaker <ion-label *ngIf="coffeeMakerController">{{coffeeMakerController.ip}}</ion-label> </ion-title>
+    <ion-button slot="end" (click)="forceActionSheet()">
+      <ion-icon slot="end" name="user"></ion-icon>
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 
@@ -16,7 +19,7 @@
     </ion-card-header>
 
     <ion-card-content>
-      <p *ngIf="coffeeIntent && !coffeeIntent.done">{{coffeeIntent.timerpassed}}</p>
+      <p *ngIf="coffeeIntent && !coffeeIntent.done">T: -{{coffeeIntent.timeRemaning}} segundos</p>
       <ion-progress-bar *ngIf="coffeeIntent && !coffeeIntent.done" [value]="coffeeIntent.timerpassed"></ion-progress-bar>
       <ion-button size="large" color="success" (click)="startCoffee()" *ngIf="!coffeeIntent || (coffeeIntent && coffeeIntent.done)">
         Iniciar
