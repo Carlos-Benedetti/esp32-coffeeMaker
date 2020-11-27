@@ -1,16 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
-import { of, throwError } from 'rxjs';
-import { catchError, mergeMap, tap } from 'rxjs/operators';
+import { of, Subject, throwError } from 'rxjs';
+import { catchError, delay, finalize, mergeMap, tap } from 'rxjs/operators';
 import { CoffeeMaker } from './coffee-maker';
+import { RequestLoaderService } from './shared/request-loader/request-loader.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CoffeeMakerService {
-
-  constructor(private http: HttpClient, public toastController: ToastController) {
+  onFinalize = () => finalize(() => this.requestLoaderService.loading = false)
+  onCatchError = () => catchError(error => { this.presentToast(); return throwError(error) })
+  constructor(private http: HttpClient, public toastController: ToastController, public requestLoaderService: RequestLoaderService) {
 
   }
   async presentToast() {
@@ -22,11 +24,19 @@ export class CoffeeMakerService {
   }
 
   on(cooffeeMaker: CoffeeMaker) {
-    return this.http.get(`${cooffeeMaker.ip}/on`, { observe: 'response' }).pipe(
-      catchError(error => { this.presentToast(); return throwError(error) })
-    )
+    this.requestLoaderService.loading = true
+    return this.http.get(`${cooffeeMaker.ip}/on`, { observe: 'response' })
+      .pipe(
+        this.onFinalize(),
+        this.onCatchError()
+      )
   }
   off(cooffeeMaker: CoffeeMaker) {
-    return this.http.get(`${cooffeeMaker.ip}/off`)
+    this.requestLoaderService.loading = true
+    return this.http.get(`${cooffeeMaker.ip}/off`,{ observe: 'response' })
+      .pipe(
+        this.onFinalize(),
+        this.onCatchError()
+      )
   }
 }

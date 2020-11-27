@@ -18,12 +18,10 @@ export class CoffeemakerDBService {
 
   init() {
     firebase.auth().onAuthStateChanged((user) => {
-      console.log(firebase.auth().currentUser)
       this.user = user
       this.dbRef = firebase.database().ref('coffeeMakers/' + user.uid)
       this.dbRef.get().then(snapshot => {
         const raw = this.getArrayFromSnapshot(snapshot)
-        console.log(raw)
         raw.forEach(cm => {
           this.apendCoffeeMaker(cm);
         })

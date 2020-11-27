@@ -14,6 +14,8 @@ import { environment } from 'src/environments/environment';
 import { CoffeemakerDBService } from './coffeemaker-db.service';
 import firebase from 'firebase';
 import { HttpClientModule } from '@angular/common/http';
+import { RequestLoaderComponent } from './shared/request-loader/request-loader.component';
+import { SharedModule } from './shared/shared.module';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -23,7 +25,8 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
-    HttpClientModule
+    HttpClientModule,
+    SharedModule
   ],
   providers: [
     StatusBar,

@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { CoffeemakerPageRoutingModule } from './coffeemaker-routing.module';
 
 import { CoffeemakerPage } from './coffeemaker.page';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    CoffeemakerPageRoutingModule
+    SharedModule,
+    CoffeemakerPageRoutingModule,
   ],
   declarations: [CoffeemakerPage]
 })
